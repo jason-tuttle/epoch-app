@@ -8,6 +8,7 @@ import { StyleSheet,
   Switch,
   SegmentedControlIOS,
 } from 'react-native';
+import AddTimerButton from './AddTimerButton';
 
 
 
@@ -25,17 +26,23 @@ export default class App extends React.Component {
   }
 
   updateTime = () => {
-    // get the current count from state.time
-    let theTime = this.state.time;
+    const {startTime} = this.state;
+    let theTime = null;
+    // get the current time
+    const now = new Date(Date.now());
     if (this.state.timerIsRunning) {
       // increment the count if we're timing (so we can use this for reset, too)
-      theTime++;
+      theTime = Math.round((now - startTime) / 1000);
     }
     const mins = Math.floor(theTime / 60);
     const ss = (theTime % 60) % 10;
     const s = Math.floor((theTime % 60) / 10);
     // set the time string into state for display
     this.setState({time: theTime, timeString: `${mins}:${s}${ss}`});
+  }
+
+  addTimer = () => {
+    console.log('added');
   }
 
   runTimer = () => {
@@ -53,7 +60,7 @@ export default class App extends React.Component {
   }
 
   resetTimer = () => {
-    this.setState({time: 0, timeString: '0:00'});
+    this.setState({time: 0, timerIsRunning: false, timeString: '0:00', startTime: null, stopTime: null});
   }
 
   render() {
@@ -81,12 +88,8 @@ export default class App extends React.Component {
           <Button title={buttonText} color={timerIsRunning ? "#FF0000" : "#00AA00"} onPress={this.runTimer}/>
           <Button title='Reset' color="#AA3333" onPress={this.resetTimer}/>
         </View>
-        <SegmentedControlIOS values={['+', 'Stopwatch', 'Countdown']} enabled selectedIndex={0}/>
-        <View style={{flex: 0, flexDirection: 'row', alignItems: 'center'}}>
-
-          <Text style={styles.label}>Stopwatch</Text>
-          <Switch onTintColor="#00AA00" />
-          <Text style={styles.label}>Countdown</Text>
+        <View style={styles.addContainer}>
+          <AddTimerButton onClick={this.addTimer} addSW={this.addTimer} addCD={this.addTimer} />
         </View>
       </View>
     );
@@ -106,6 +109,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     height: 40,
+    backgroundColor: '#666666'
+  },
+  addContainer: {
+    flex: 0,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#666666'
   },
   welcome: {
@@ -137,7 +148,7 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   label: {
     color: '#FFFFFF',
